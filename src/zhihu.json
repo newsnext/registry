@@ -1,0 +1,37 @@
+{
+  "title": "知乎",
+  "category": "forum",
+  "color": "blue",
+  "defaults": {
+    "baseUrl": "https://www.zhihu.com/",
+    "metadata": {
+      "home": "/"
+    }
+  },
+  "sources": {
+    "hot-list": {
+      "metadata": {
+        "title": "热榜"
+      },
+      "loader": {
+        "type": "json",
+        "url": "/api/v3/feed/topstory/hot-list-web?limit=50&desktop=true",
+        "items": "data",
+        "fields": {
+          "title": "target.title_area.text",
+          "url": "target.link.url",
+          "mark": {
+            "src": "card_label.night_icon",
+            "kind": { "template": "trend" },
+            "label": "card_label.text"
+          },
+          "content": {
+            "text": "target.excerpt_area.text",
+            "pictures": "target.image_area.url"
+          }
+        }
+      },
+      "cache": "5m"
+    }
+  }
+}

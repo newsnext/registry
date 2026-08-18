@@ -1,0 +1,35 @@
+{
+  "title": "百度贴吧",
+  "category": "forum",
+  "color": "blue",
+  "defaults": {
+    "baseUrl": "https://tieba.baidu.com/",
+    "metadata": {
+      "home": "/"
+    }
+  },
+  "sources": {
+    "hot-topic": {
+      "metadata": {
+        "title": "热议"
+      },
+      "loader": {
+        "type": "json",
+        "url": "/hottopic/browse/topicList",
+        "items": "data.bang_topic.topic_list",
+        "fields": {
+          "title": "topic_name",
+          "url": {
+            "select": "topic_url",
+            "template": "{{ scope.value | replace: '&amp;', '&' }}"
+          },
+          "publishedAt": {
+            "select": "create_time",
+            "template": "{{ scope.value | times: 1000 }}"
+          }
+        }
+      },
+      "cache": "5m"
+    }
+  }
+}

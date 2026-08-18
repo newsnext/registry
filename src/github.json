@@ -1,0 +1,101 @@
+{
+  "title": "GitHub",
+  "category": "developer",
+  "color": "slate",
+  "defaults": {
+    "baseUrl": "https://github.com/",
+    "metadata": {
+      "home": "/trending"
+    }
+  },
+  "sources": {
+    "trending": {
+      "metadata": {
+        "title": "Trending"
+      },
+      "params": {
+        "language": {
+          "type": "text",
+          "title": "Language",
+          "description": "Programming language slug used by GitHub Trending, such as javascript, go, or rust.",
+          "default": ""
+        },
+        "spokenLanguage": {
+          "type": "text",
+          "title": "Spoken Language",
+          "description": "Repository description language code, such as en, zh, or ja.",
+          "default": ""
+        },
+        "dateRange": {
+          "type": "select",
+          "title": "Date range",
+          "values": [
+            {
+              "label": "Today",
+              "value": "daily"
+            },
+            {
+              "label": "This week",
+              "value": "weekly"
+            },
+            {
+              "label": "This month",
+              "value": "monthly"
+            }
+          ],
+          "default": "daily"
+        }
+      },
+      "radar": [
+        {
+          "id": "github-trending",
+          "match": {
+            "hosts": [
+              "github.com"
+            ],
+            "paths": [
+              "/trending",
+              "/trending/:language"
+            ]
+          },
+          "patch": {
+            "params": {
+              "language": "{{ scope.path.language }}",
+              "spokenLanguage": "{{ scope.query.spoken_language_code }}",
+              "dateRange": "{{ scope.query.since }}"
+            },
+            "metadata": {
+              "title": "Trending {{ scope.params.language }}"
+            }
+          },
+          "confidence": 0.95
+        }
+      ],
+      "loader": {
+        "type": "html",
+        "url": "/trending{% if scope.params.language %}/{{ scope.params.language | url_path }}{% endif %}?since={{ scope.params.dateRange | url_query }}{% if scope.params.spokenLanguage %}&spoken_language_code={{ scope.params.spokenLanguage | url_query }}{% endif %}",
+        "items": "main .Box div[data-hpc] > article",
+        "fields": {
+          "title": {
+            "select": ">h2 a",
+            "template": "{{ scope.value | normalize_whitespace }}"
+          },
+          "url": {
+            "select": ">h2 a",
+            "attr": "href"
+          },
+          "stats": {
+            "stars": {
+              "select": "[href$=stargazers]",
+              "template": "{{ scope.value | replace: ',', '' }}"
+            }
+          },
+          "content": {
+            "text": ">p"
+          }
+        }
+      },
+      "cache": "15m"
+    }
+  }
+}

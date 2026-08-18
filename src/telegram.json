@@ -1,0 +1,97 @@
+{
+  "title": "Telegram",
+  "category": "social",
+  "color": "blue",
+  "defaults": {
+    "baseUrl": "https://t.me/",
+    "metadata": {
+      "home": "/"
+    }
+  },
+  "sources": {
+    "channel": {
+      "metadata": {
+        "title": "Channel"
+      },
+      "params": {
+        "channel": {
+          "type": "text",
+          "default": "TestFlightCN",
+          "title": "Channel"
+        }
+      },
+      "radar": [
+        {
+          "id": "telegram-channel",
+          "match": {
+            "hosts": [
+              "t.me",
+              "telegram.me"
+            ],
+            "paths": [
+              "/s/:channel",
+              "/:channel"
+            ]
+          },
+          "patch": {
+            "params": {
+              "channel": "{{ scope.path.channel }}"
+            },
+            "metadata": {
+              "title": {
+                "select": ".tgme_channel_info_header_title"
+              },
+              "badge": "/i/userpic/320/{{ scope.params.channel | url_path }}.jpg",
+              "home": "/s/{{ scope.params.channel }}"
+            }
+          },
+          "confidence": 0.95
+        }
+      ],
+      "loader": {
+        "type": "html",
+        "url": "/s/{{ scope.params.channel | url_path }}",
+        "items": ".tgme_widget_message:has(.tgme_widget_message_text)",
+        "fields": {
+          "title": {
+            "select": ".tgme_widget_message_text:not(.js-message_reply_text)",
+            "brSeparator": "\n",
+            "template": "{{ scope.value | first_line | truncate: 160, '…' }}"
+          },
+          "url": {
+            "select": ".tgme_widget_message_date",
+            "attr": "href"
+          },
+          "publishedAt": {
+            "select": ".tgme_widget_message_date time",
+            "attr": "datetime",
+            "template": "{{ scope.value | date_to_ms }}"
+          },
+          "stats": {
+            "views": {
+              "select": ".tgme_widget_message_views",
+              "template": "{{ scope.value | parse_compact_number }}"
+            }
+          },
+          "content": {
+            "text": {
+              "select": [
+                ".js-message_reply_text",
+                ".tgme_widget_message_text:not(.js-message_reply_text)"
+              ],
+              "brSeparator": "\n",
+              "template": "{{ scope.value | normalize_lines: 2 }}"
+            },
+            "pictures": {
+              "select": ".tgme_widget_message_photo_wrap, .tgme_widget_message_video_thumb",
+              "attr": "style",
+              "template": "{{ scope.value | css_url }}"
+            }
+          }
+        },
+        "sortByTimestamp": true
+      },
+      "cache": "5m"
+    }
+  }
+}

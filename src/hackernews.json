@@ -1,0 +1,128 @@
+{
+  "title": "Hacker News",
+  "category": "forum",
+  "color": "orange",
+  "defaults": {
+    "baseUrl": "https://news.ycombinator.com/",
+    "cache": "5m",
+    "loader": {
+      "type": "html",
+      "url": "/",
+      "items": ".athing",
+      "fields": {
+        "title": ".titleline>a",
+        "url": {
+          "select": "",
+          "attr": "id",
+          "template": "/item?id={{ scope.value | url_query }}"
+        },
+        "publishedAt": {
+          "traverse": {
+            "type": "next",
+            "selector": "tr"
+          },
+          "select": ".age",
+          "attr": "title",
+          "template": "{{ scope.value | split: ' ' | last | times: 1000 }}"
+        },
+        "author": {
+          "name": {
+            "traverse": {
+              "type": "next",
+              "selector": "tr"
+            },
+            "select": ".hnuser"
+          },
+          "home": {
+            "traverse": {
+              "type": "next",
+              "selector": "tr"
+            },
+            "select": ".hnuser",
+            "attr": "href"
+          }
+        },
+        "stats": {
+          "score": {
+            "traverse": {
+              "type": "next",
+              "selector": "tr"
+            },
+            "select": ".score",
+            "template": "{{ scope.value | regex_extract: '([0-9]+)', 1 }}"
+          },
+          "comments": {
+            "traverse": {
+              "type": "next",
+              "selector": "tr"
+            },
+            "select": ".subline > a:last-child",
+            "template": "{{ scope.value | regex_extract: '([0-9]+)', 1 | default: 0 }}"
+          }
+        },
+        "attributes": {
+          "rank": {
+            "select": ".rank",
+            "template": "{{ scope.value | regex_extract: '([0-9]+)', 1 }}"
+          },
+          "site": ".sitestr",
+          "externalUrl": {
+            "select": ".titleline>a",
+            "attr": "href",
+            "template": "{{ scope.value | absolute_url: scope.request.url }}"
+          }
+        },
+        "icon": {
+          "src": {
+            "select": ".titleline>a",
+            "attr": "href",
+            "template": "{{ scope.value | absolute_url: scope.request.url | favicon_url }}"
+          },
+          "kind": { "template": "site" },
+          "label": ".sitestr"
+        }
+      },
+      "itemTemplate": {
+        "inline": "{{ scope.item.author.name }}"
+      }
+    },
+    "metadata": {
+      "home": "/"
+    }
+  },
+  "sources": {
+    "top": {
+      "metadata": {
+        "title": "Hottest"
+      }
+    },
+    "newest": {
+      "metadata": {
+        "title": "Newest",
+        "home": "/newest"
+      },
+      "loader": {
+        "url": "/newest"
+      },
+      "cache": "1m"
+    },
+    "show": {
+      "metadata": {
+        "title": "Show",
+        "home": "/show"
+      },
+      "loader": {
+        "url": "/show"
+      }
+    },
+    "ask": {
+      "metadata": {
+        "title": "Ask",
+        "home": "/ask"
+      },
+      "loader": {
+        "url": "/ask"
+      }
+    }
+  }
+}
