@@ -5,7 +5,8 @@
   "license": "MPL-2.0",
   "sideEffects": false,
   "exports": {
-    ".": "./index.ts"
+    ".": "./index.ts",
+    "./catalog": "./catalog.json"
   },
   "scripts": {
     "build": "bun run build.ts",
