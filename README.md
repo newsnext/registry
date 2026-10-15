@@ -1,36 +1,33 @@
 # NewsNext Registry
 
-Public Sources, Plugins, Actions, and Insights for NewsNext. This repository is
-also the `registry/` submodule of [NewsNext](https://github.com/newsnext/newsnext).
+Public Source Providers for NewsNext. This repository is
+developed beside the public [NewsNext](https://github.com/newsnext/newsnext) checkout.
+
+Every registry must contain a `sources/` directory at the repository root. The
+CLI reads this directory directly; no index file or build step is required.
 
 - `sources/<provider>.json`, `sources/<provider>.js`, or
   `sources/<provider>/index.js` (also `.mjs`): original Source Providers.
-- `actions/<id>/`: `action.json` and `index.mjs`, plus supporting files.
-- `insights/<id>/`: `insight.json`, optionally `data.mjs`, `index.html`, and assets.
-- `plugins/<id>/`: `plugin.json` and optional `sources/`, `actions/`, `insights/`
-  using the same layouts. Plugin resources remain scoped to their plugin.
 
-IDs come from file or directory names. Manifests follow the public SDK schemas.
+Provider IDs come from file or directory names. Definitions follow the public SDK schemas.
 Do not include credentials or personal configuration.
 
-For development, clone NewsNext with `--recurse-submodules`, run `bun install`
-in its root, then run:
+This is a resource repository, with no package manifest, dependencies, or runtime
+entry. Source modules use the SDK supplied by their host. Hosts explicitly import
+the Providers they need and resolve them with `@newsnext/sdk/source/registry`;
+registry membership alone never bundles a Provider.
+
+The NewsNext CLI preconfigures this repository as `official` at
+`https://github.com/newsnext/registry`; no manual registration is needed.
+`newsnext registry update official` downloads and registers all its Sources.
+Use `newsnext registry list official` to inspect available Providers.
+
+Validation belongs to the public NewsNext checkout. With
+that checkout beside this repository, run this command from its root:
 
 ```sh
-bun --filter=@newsnext/registry run validate
-bun --filter=@newsnext/registry run build
-bun --filter=@newsnext/registry run typecheck
+bun run registry:validate
 ```
 
-The SDK and TypeScript configuration are supplied by the NewsNext workspace;
-no published SDK package is required. Validation resolves Source definitions
-without fetching their data and checks standalone and plugin manifests. Action
-and Insight modules are cataloged without executing them.
-
-Build generates `catalog.json` with repository-relative resource paths and
-manifests for all four resource kinds. Plugin entries include their own resource
-catalogs. `@newsnext/registry/catalog` exposes this index. It is discovery metadata;
-installation and execution belong to the host. Build also generates `sources.js`
-and `sources.d.ts` for the extension's bundled standalone Sources. Plugins,
-Actions, and Insights are installed separately, not bundled into the extension.
-Do not edit generated files directly.
+Validation resolves Source definitions without fetching data or generating files.
+Registration and execution belong to the host.
